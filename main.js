@@ -35,28 +35,29 @@ D1D1.addSubs([D1D1D1, D1D1D2, D1D1D3])
 D1.addSubs([D1D1, D2D1, D3D1])
 D2.addSubs([D1D2, D2D2, D3D2])
 
-let pieChart0 = new pieChart({x0: 0, x1: 400, y0: 0, y1: 400}, 'Test piechart 0')
+let pieChart0 = new pieChart({x0: 0, x1: 400, y0: 0, y1: 400}, 'Test0')
 pieChart0.addData(D1)
 pieChart0.addData(D2)
 pieChart0.addData(D3)
 
 pieChart0.render()
 
-let scatterPlot0 = new scatterPlot({x0: 400, x1: 1200, y0: 0, y1: 400}, 'Test', 0.00, 1.00)
+let scatterPlot0 = new scatterPlot({x0: 400, x1: 800, y0: 0, y1: 200}, 'Test', 0.00, 1.00)
 
-for (let i = 0; i < (scatterPlot0.x1 - scatterPlot0.x0); i++) {
-	let midPoint = 	(scatterPlot0.x1 - scatterPlot0.x0)/2
-	scatterPlot0.addData(Math.pow(i-midPoint, 1))
+for (let i = 0; i < scatterPlot0.xLen; i++) {
+	let midPoint = 	scatterPlot0.xLen/2
+	let nData = new data( Math.pow(midPoint-i, 2) )
+
+	scatterPlot0.addData(nData)
 }
 
 scatterPlot0.scale()
-
 scatterPlot0.render()
 
+console.log(scatterPlot0.maxPoints)
+console.log(scatterPlot0.data.length)
+
 /* TODO
- * Fix reverse ordering of scatter plot data
- * Make scatter plot use the Data object
- * Clean up scatter plot code
  * Create bar chart
  * Create data label
  * Create stacked area chart
