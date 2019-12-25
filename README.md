@@ -12,5 +12,5 @@ I also plan to include mathematical tools to interpret data, such as taking four
 I'm also playing around with animations in a separate repository to better tell the data's story.
 
 Some examples of visualization currently available
-[Scatter plot](https://imgur.com/Wttqv0x)
-[Nested pie chart](https://imgur.com/qCf6OIt)
+[Scatter plot](https://i.imgur.com/Wttqv0x.png)
+[Nested pie chart](https://i.imgur.com/Wttqv0x.png)
