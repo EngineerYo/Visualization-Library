@@ -1,4 +1,4 @@
-let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
+let barPlot = function(pos, name, yLim0, yLim1, p=5) {
 	let {x0, x1, y0, y1} = 	pos
 
 	this.x0 = 	x0
@@ -14,17 +14,11 @@ let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
 	this.lBound = x0 + this.p
 	this.rBound = x1 - this.p
 
-	this.xLen = 	x1 - x0 - p*2
-	this.yLen = 	y1 - y0 - this.margin*2 - p*2
-
-	this.cMin =	+1e100
-	this.cMax =	-1e100
+	this.xLen = 	x1 - x0 - this.p*2
+	this.yLen = 	y1 - y0 - this.p*2 - this.margin
 
 	this.name = name
-
-	this.transform = function(num, s0, s1) {
-		return num*(s1/s0)
-	}
+	this.catSums = {}
 
 	this.initialize = function() {
 		if (yLim0 !== undefined) {
@@ -40,16 +34,8 @@ let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
 			this.yLim1 = 0
 		}
 
-		this.data = []
+		this.data = {}
 		this.name = name
-
-		if (maxPoints === undefined) {
-			this.maxPoints = 	this.xLen
-		}
-		else {
-			this.maxPoints = maxPoints
-		}
-
 	}
 	this.construct = function(scope) {
 		let {tBound, lBound, rBound, bBound, xLen, yLen, p, name} = scope
@@ -76,9 +62,9 @@ let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
 			.attr('x', lBound).attr('y', tBound)
 			.attr('width', xLen).attr('height', y1 - y0 - p*2)
 			.attr('fill', 'white').attr('fill-opacity', 0)
-			.on('mouseover', 	function() {onOver(name, 	this, 	{lBound: lBound, tBound: tBound})	})
-			.on('mouseleave', 	function() {onLeave(name, 	this, 	{lBound: lBound, tBound: tBound})	})
-			.on('mousemove', 	function() {onMove(name, 	this, 	{lBound: lBound, tBound: tBound})	})
+			.on('mouseover', 	function() {onOver(name, this)	})
+			.on('mouseleave', 	function() {onLeave(name, this)	})
+			.on('mousemove', 	function() {onMove(name, this)	})
 
 
 		d3.select(`#${name}`).select(`#disp`).append('text')
@@ -135,35 +121,11 @@ let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
 	}
 
 	let onOver = function(name, obj) {
-		d3.select(`#${name}`).select(`#xLoc`)
-			.attr('visibility', 'visible')
-		d3.select(`#${name}`).select(`#yLoc`)
-			.attr('visibility', 'visible')
-		d3.select(`#${name}`).select(`#display`)
-			.attr('visibility', 'visible')
 	}
 	let onLeave = function(name, obj) {
-		d3.select(`#${name}`).select(`#xLoc`)
-			.attr('visibility', 'hidden')
-		d3.select(`#${name}`).select(`#yLoc`)
-			.attr('visibility', 'hidden')
-		d3.select(`#${name}`).select(`#display`)
-			.attr('visibility', 'hidden')
 	}
-	let onMove = function(name, obj, scope) {
-		let {lBound, tBound} = scope
+	let onMove = function(name, obj) {
 		let mouse = d3.mouse(obj)
-		let xPos = (mouse[0]).toFixed(0)
-		let yPos = (mouse[1]).toFixed(0)
-		d3.select(`#${name}`).select(`#xLoc`)
-			.attr('x1', xPos).attr('x2', xPos)
-		d3.select(`#${name}`).select(`#yLoc`)
-			.attr('y1', yPos).attr('y2', yPos)
-
-		d3.select(`#${name}`).select(`#display`)
-			.attr('x', mouse[0] + 2)
-			.attr('y', mouse[1] - 2)
-			.text(`${(xPos - lBound).toFixed(0)}\n${(yPos - tBound).toFixed(0)}`)
 	}
 
 	this.initialize()
@@ -171,49 +133,57 @@ let scatterPlot = function(pos, name, yLim0, yLim1, p=5, maxPoints) {
 	this.setup({name: this.name})
 	this.construct({tBound: this.tBound, lBound: this.lBound, rBound: this.rBound, bBound: this.bBound, p: this.p, xLen: this.xLen, yLen: this.yLen, name: this.name})
 }
-scatterPlot.prototype.addData = function(datum, render = false) {
-	this.data.unshift(datum)
-	if (this.data.length > this.maxPoints) {
-		this.data.pop()
-	}
+barPlot.prototype.sort = function(type) {
+	if (type == 'ASCEND') {
 
-	if (datum.v > this.cMax) {
-		this.cMax = datum.v
 	}
-	if (datum.v < this.cMin) {
-		this.cMin = datum.v
-	}
+	else if (type == 'DESCEND') {
 
-	if (render == true) {
-		this.render()
+	}
+	else if (type == 'ALPHABETICAL') {
+
 	}
 }
-scatterPlot.prototype.render = function() {
-	d3.select(`#${this.name}`).select(`#data`).selectAll('*').remove()
-	// d3.select(`#${name}`).select(`#data`).selectAll(`#Line-${this.name}`).remove()
+barPlot.prototype.addData = function(datum) {
+	if (this.data[datum.opts.category] === undefined) {
+		this.data[datum.opts.category] = [datum]
+		this.catSums[datum.opts.category] = datum.v
+	}
+	else {
+		this.data[datum.opts.category].push(datum)
+		this.catSums[datum.opts.category] += datum.v
+	}
+}
+barPlot.prototype.removeData = function(category, label) {
+	delete this.data[category][label]
+}
 
-	let topLine = 	this.y0 + this.margin + this.p
-	let botLine = 	this.y1 - this.margin - this.p
+barPlot.prototype.render = function() {
 
-	let subDivs = 	this.maxPoints
-	let divLen = 	this.xLen/subDivs
+	let nCategories = 	Object.keys(this.data).length
+	let xSpan = 		(this.xLen+this.p*2)/nCategories
+
+	let count = 	0
 
 	for (let i in this.data) {
+		let cat = 		this.data[i]
+		let sum = 		this.catSums[i]
 
-		let ratio = 	(this.data[i].v)/(this.yLim1 - this.yLim0)
 
-		let xLoc = 		i*divLen + this.x0 + this.p + divLen
-		let yLoc = 		this.yLen*(1 - ratio) + this.margin + this.p
+		for (let v in this.data[i]) {
+			let datum = 	cat[v]
 
-		d3.select(`#${this.name}`).select(`#data`).append('circle')
-			.attr('cx', xLoc).attr('cy', yLoc)
-			.attr('r', 0.5).style('stroke', 'black')
+			let ySpan = 	(datum.v/sum) * (yLen)
+			let xLoc = 		this.lBound + this.p + count*xSpan
+			let yLoc = 		this.bBound - ySpan
+
+			d3.select(`#{this.name}`).select(`#data`).append('rect')
+				
+			}
+		}
+		let ySpan =		(this.data[i])
+
+
 	}
-}
-scatterPlot.prototype.clearData = function() {
-	this.data = []
-}
-scatterPlot.prototype.scale = function() {
-	this.yLim0 = 	this.cMin
-	this.yLim1 = 	this.cMax
+
 }

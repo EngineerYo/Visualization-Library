@@ -1,5 +1,3 @@
-'use strict'
-
 let C0 = 		d3.hsl(240, 0.50, 0.50)
 let C1 = 		d3.hsl(  0, 0.50, 0.50)
 let C2 =		d3.hsl(  0, 0.00, 0.50)
@@ -42,7 +40,7 @@ pieChart0.addData(D3)
 
 pieChart0.render()
 
-let scatterPlot0 = new scatterPlot({x0: 400, x1: 800, y0: 0, y1: 200}, 'Test', 0.00, 1.00)
+let scatterPlot0 = new scatterPlot({x0: 400, x1: 800, y0: 0, y1: 200}, 'Test1', 0.00, 1.00)
 
 for (let i = 0; i < scatterPlot0.xLen; i++) {
 	let midPoint = 	scatterPlot0.xLen/2
@@ -53,9 +51,6 @@ for (let i = 0; i < scatterPlot0.xLen; i++) {
 
 scatterPlot0.scale()
 scatterPlot0.render()
-
-console.log(scatterPlot0.maxPoints)
-console.log(scatterPlot0.data.length)
 
 /* TODO
  * Create bar chart

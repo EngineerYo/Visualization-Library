@@ -1,14 +1,17 @@
-let data = function(v, label = '', opts = {}) {
+let dId = 	0
 
+let data = function(v, label = '', opts = {}) {
 	if (v === undefined) {
 		throw new Error(`ERROR\tNo value to data`)
 	}
 
+	this.id = 		dId
 	this.v = 		v
 	this.label = 	label
 	this.opts = 	opts
 	this.sub = 		{}
 
+	dId++
 	return this
 }
 

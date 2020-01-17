@@ -128,7 +128,6 @@ pieChart.prototype.render = function() {
 pieChart.prototype.renderArc = function(datum, depth = 0, numChildren = Object.keys(this.data).length, parentAngle = Math.PI*2, parentSum = this.sum) {
 
 	this.onOver = function(name) {
-		console.log(JSON.stringify(this))
 		d3.select(`#${name}`).select(`#display`)
 			.attr('visibility', 'visible')
 			.text(datum.v)
@@ -172,7 +171,6 @@ pieChart.prototype.renderArc = function(datum, depth = 0, numChildren = Object.k
 		.attr('transform', `translate(${this.x0 + this.r + this.p}, ${this.y0 + this.r + this.p})`)
 		.attr('name', this.label)
 		.on('mouseover', function() {
-			console.log(datum.v)
 			d3.select(`#${name}`).select(`#display`)
 				.attr('visibility', 'visible')
 				.text(datum.v)
